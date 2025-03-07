@@ -156,20 +156,20 @@ def main_menu():
 
 def developer_mode():
     """This is the developer mode of the program. This can only be access with a certain password. """
-        while True:
-            print("1. Display statistics of the news data for a specific date")
-            print("2. Open the CSV file with the default application")
-            print("3. Exit")
-            choice = input()
+    while True:
+        print("1. Display statistics of the news data for a specific date")
+        print("2. Open the CSV file with the default application")
+        print("3. Exit")
+        choice = input()
         
-            if choice == "1":
-                date = input("Enter the date (YYYY-MM-DD) to search: ")
-                display_statistics_by_date(date)
-            elif choice == "2":
-                open_csv_in_default_app()
-            elif choice == "3":
-                print("Exiting the program. Goodbye!")
-                break
+        if choice == "1":
+            date = input("Enter the date (YYYY-MM-DD) to search: ")
+            display_statistics_by_date(date)
+        elif choice == "2":
+            open_csv_in_default_app()
+        elif choice == "3":
+            print("Exiting the program. Goodbye!")
+            break
    
 # Run the web crawler and main menu
 if __name__ == "__main__":
