@@ -4,8 +4,6 @@ import pandas as pd
 from datetime import datetime
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
-import platform
-import subprocess
 
 # Define news websites to scrape
 NEWS_SITES = {
@@ -13,9 +11,6 @@ NEWS_SITES = {
     "The Guardian": "https://www.theguardian.com/world",
     "Medium": "https://medium.com"
 }
-
-# CSV file to store news data
-CSV_FILE = os.path.join(os.path.dirname(__file__), "news_data.csv")  # Save in the same folder as the script
 
 def fetch_news_content(url):
     """Fetch and extract main article content from the given URL."""
@@ -82,18 +77,25 @@ def scrape_news():
     return news_data
 
 def save_to_csv(news_data):
-    """Save scraped news data to CSV, appending new data and avoiding duplicates."""
+    """Save news data to a CSV file."""
     # Create DataFrame from news data
     df_new = pd.DataFrame(news_data)
     
-    # Check if the CSV file already exists
-    if os.path.exists(CSV_FILE):
-        df_existing = pd.read_csv(CSV_FILE)
-        # Append new data to existing data, avoiding duplicates
-        df_combined = pd.concat([df_existing, df_new]).drop_duplicates(subset=["Date", "Source", "Title", "URL"])
-    else:
-        df_combined = df_new
+    # Set CSV file name to the current date
+    today = datetime.today().strftime("%Y-%m-%d")
+    csv_file = os.path.join(os.path.dirname(__file__), f"{today}.csv")
     
-    # Save the combined data back to the CSV file
-    df_combined.to_csv(CSV_FILE, index=False, encoding="utf-8")
-    print(f"✅ News data saved to {CSV_FILE}")
+    # Save to CSV
+    df_new.to_csv(csv_file, index=False)
+    
+    print(f"✅ News data saved to {csv_file}")
+    return csv_file
+
+if __name__ == "__main__":
+    print("🕷️ Running the web crawler to fetch the latest news...")
+    news_data = scrape_news()
+    if news_data:
+        csv_file = save_to_csv(news_data)
+        print("✅ Web crawler completed.")
+    else:
+        print("❌ No new articles found.")
