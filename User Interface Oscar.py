@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import platform
 import subprocess
+from datetime import datetime
 
 # Developer mode password
 DEVELOPER_PASSWORD = "DDL"
@@ -37,12 +38,24 @@ def display_statistics_by_date(csv_file, date):
     else:
         print("❌ CSV file does not exist.")
 
-def developer_mode():
+def developer_mode(csv_file):
     """Developer mode for additional functionality."""
     print("\n🔧 Developer mode activated.")
     # Add developer-specific functions here
-    print("Developer mode functionality will be added later.")
-    print("Exiting developer mode. Goodbye!")
+    while True:
+        print("1. Open the CSV file with the default application")
+        print("2. Display statistics of the news data for a specific date")
+        print("3. Exit developer mode")
+        dm_choice = input()
+
+        if dm_choice == "1":
+            open_csv_in_default_app(csv_file)
+        elif dm_choice == "2":
+            display_statistics_by_date(csv_file, date)
+        elif dm_choice == "3":
+            main_menu(csv_file)
+        else:
+            print("❌ Invalid choice. Please try again.")
 
 def main_menu(csv_file):
     """Display the main menu and handle user input."""
@@ -62,8 +75,7 @@ def main_menu(csv_file):
             print("Exiting the program. Goodbye!")
             break
         elif choice == DEVELOPER_PASSWORD:  # Developer mode activation
-            developer_mode()
-            break
+            developer_mode(csv_file)
         else:
             print("❌ Invalid choice. Please try again.")
 
