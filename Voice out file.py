@@ -20,7 +20,7 @@ def read_csv_and_speak(file_path):
 
         # 確認文件是否有數據
         if data.empty:
-            print("CSV 文件是空的！")
+            print("The CSV File is empty")
             engine.say("The CSV file is empty.")
             engine.runAndWait()
             return
@@ -48,5 +48,5 @@ def read_csv_and_speak(file_path):
 
 # 測試程式
 if __name__ == "__main__":
-    file_path = "C:\\Users\\chngo\\OneDrive\\Desktop\\EdUHK\\2425\\S2\\Courses\\INT2093 Fundemental of Neural Networks\\INT2093 Group Project\\news_data.csv" # 替換為你的 CSV 文件路徑
+    file_path = "C:\\Users\\chngo\\OneDrive\\Desktop\\EdUHK\\2425\\S2\\Courses\\INT2093 Fundemental of Neural Networks\\INT2093 Group Project\\news-project\\News_Data.csv"# 替換為你的 CSV 文件路徑
     read_csv_and_speak(file_path)
