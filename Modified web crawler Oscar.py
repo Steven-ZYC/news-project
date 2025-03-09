@@ -82,7 +82,7 @@ def save_to_csv(news_data):
     df_new = pd.DataFrame(news_data)
     
     # Set CSV file name to a constant value
-    csv_file = os.path.join(os.path.dirname(__file__), "News_Data.csv")
+    csv_file = os.path.join(os.path.dirname(__file__), "news_data.csv")
     
     # Save to CSV
     df_new.to_csv(csv_file, index=False)
