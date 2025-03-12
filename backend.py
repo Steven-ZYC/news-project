@@ -12,22 +12,36 @@ DEVELOPER_PASSWORD = "DDL"
 
 # OpenAI API configuration
 client = OpenAI(
-    api_key="api-key",  # Replace with your actual API key
+    api_key="sk-ca98f6ee671c4f91b0c69a379b779b82",  # Replace with your actual API key
     base_url="https://api.deepseek.com"
 )
 
 # Constant CSV file name
-CSV_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "news_data.csv")
+CSV_FILE = os.path.join(os.path.dirname((__file__)), "News_Data.csv")
 
 def load_news():
     """Reads today's news from CSV."""
     if not os.path.exists(CSV_FILE):
         print("No news data found.")
         return None
+    try:
+        # Try different encodings
+        encodings = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252']
+        for encoding in encodings:
+            try:
+                df = pd.read_csv(CSV_FILE, encoding=encoding)
+                print(f"Successfully read CSV file using {encoding} encoding.")
+                break
+            except UnicodeDecodeError:
+                continue
+        else:
+            print("Failed to read CSV file with any of the supported encodings.")
+            return None
+    except Exception as e:
+        print(f"Error reading CSV file: {e}")
+        return None
 
-    df = pd.read_csv(CSV_FILE)
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
-    #print(df["Date"])##########################################################################################################
     today_news = df[df["Date"] == df["Date"].max()]
 
     if today_news.empty:
@@ -37,14 +51,18 @@ def load_news():
     return today_news
 
 def generate_summary(news_data):
-    """Generates a summary using OpenAI GPT."""
+    client = OpenAI(
+        api_key="sk-ca98f6ee671c4f91b0c69a379b779b82",  # Replace with your actual API key
+        base_url="https://api.deepseek.com"
+    )
+    """Generates a summary using deepseek GPT."""
     news_text = "\n".join(f"- {row['Title']}: {row['Content'][:200]}" for _, row in news_data.iterrows())
 
     prompt = f"""
     Here is today's top news:
     {news_text}
 
-    Please summarize today's key events in a **friendly, conversational way**.
+    Please summarize today's key events in a **friendly, conversational way** into a short speech.
     """
     try:
         response = client.chat.completions.create(
@@ -80,8 +98,18 @@ def read_highlights_and_speak(file_path):
     Reads the highlights from the CSV file and converts them into speech.
     """
     try:
-        # Read the CSV file using pandas
-        data = pd.read_csv(file_path, encoding="utf-8")
+        # Try different encodings
+        encodings = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252']
+        for encoding in encodings:
+            try:
+                data = pd.read_csv(file_path, encoding=encoding)
+                print(f"Successfully read CSV file using {encoding} encoding.")
+                break
+            except UnicodeDecodeError:
+                continue
+        else:
+            print("Failed to read CSV file with any of the supported encodings.")
+            return
 
         # Initialize the text-to-speech engine
         engine = pyttsx3.init()
@@ -100,10 +128,19 @@ def read_highlights_and_speak(file_path):
 
         # Extract highlights (first 500 characters of content)
         for index, row in data.iterrows():
-            highlight = f"Title: {row['Title']}. Content: {row['Content'][:500]}"
-            print(f"Reading highlight {index + 1}: {highlight}")  # Display in the terminal
-            engine.say(highlight)  # Speak the highlight
-
+            try:
+                highlight = f"Title: {row['Title']}. Content: {row['Content'][:500]}"
+                print(f"Reading highlight {index + 1}: {highlight}")  # Display in the terminal
+                engine.say(highlight)  # Speak the highlight
+            except UnicodeEncodeError as e:
+                print(f"Encoding error when processing row {index + 1}: {e}")
+                print("Trying to clean the text...")
+                cleaned_title = ''.join([c for c in str(row['Title']) if ord(c) < 128])
+                cleaned_content = ''.join([c for c in str(row['Content'])[:500] if ord(c) < 128])
+                highlight = f"Title: {cleaned_title}. Content: {cleaned_content}"
+                print(f"Reading cleaned highlight {index + 1}: {highlight}")
+                engine.say(highlight)
+        
         # Wait for the speech to finish
         engine.runAndWait()
 
@@ -134,37 +171,18 @@ def open_csv_in_default_app(csv_file):
     else:
         print(f"❌ CSV file does not exist at: {csv_file}")
 
-def display_statistics_by_date(csv_file, date):
-    """Display statistics for news data on a specific date."""
-    if os.path.exists(csv_file):
-        try:
-            df = pd.read_csv(csv_file)
-            df = df[df['Date'] == date]  # Filter by date
-            print(f"\n📊 Statistics for {date}:")
-            print(f"Total articles: {len(df)}")
-            print(f"Sources: {df['Source'].unique()}")
-            print(f"Articles per source:\n{df['Source'].value_counts()}")
-        except Exception as e:
-            print(f"❌ No data found for {date}: {e}")
-    else:
-        print(f"❌ CSV file does not exist at: {csv_file}")
-
 def developer_mode(csv_file):
     """Developer mode for additional functionality."""
     print("\n🔧 Developer mode activated.")
     # Add developer-specific functions here
     while True:
         print("1. Open the CSV file with the default application")
-        print("2. Display statistics of the news data for a specific date")
-        print("3. Exit developer mode")
+        print("2. Exit developer mode")
         dm_choice = input("Enter your choice: ")
 
         if dm_choice == "1":
             open_csv_in_default_app(csv_file)
         elif dm_choice == "2":
-            date = input("Enter the date (YYYY-MM-DD) to search: ")
-            display_statistics_by_date(csv_file, date)
-        elif dm_choice == "3":
             print("Exiting developer mode.")
             break
         else:
