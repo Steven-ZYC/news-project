@@ -17,7 +17,7 @@ CSV_FILE = os.path.join(os.path.dirname((__file__)), "News_Data.csv")
 
 # OpenAI API configuration
 client = OpenAI(
-    api_key="sk-ca98f6ee671c4f91b0c69a379b779b82",  # Replace with your actual API key
+    api_key="api-key",  # Replace with your actual API key
     base_url="https://api.deepseek.com"
 )
 
