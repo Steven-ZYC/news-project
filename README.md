@@ -5,3 +5,7 @@
 ## Featuring
 - text-to-speech
 - plugged in deepseek api-key
+
+## Environment
+- Anaconda python=3.9
+- pacages: flask pandas matplotlib pyttsx3
